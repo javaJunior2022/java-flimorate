@@ -1,2 +1,4 @@
-package ru.yandex.practicum.filmorate.controllers;public class UserAlreadyExistException {
+package ru.yandex.practicum.filmorate.controllers;
+
+public class UserAlreadyExistException extends Exception {
 }

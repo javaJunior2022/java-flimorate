@@ -1,2 +1,4 @@
-package ru.yandex.practicum.filmorate.controllers;public class InvalidLoginException {
+package ru.yandex.practicum.filmorate.controllers;
+
+public class InvalidLoginException extends Throwable {
 }
