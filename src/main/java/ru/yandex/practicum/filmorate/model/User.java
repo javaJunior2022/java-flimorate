@@ -34,7 +34,7 @@ public class User {
         User user = (User) o;
         return login.equals(user.login);
     }
-
+//jjjj
     @Override
     public int hashCode() {
         return Objects.hash(login);
