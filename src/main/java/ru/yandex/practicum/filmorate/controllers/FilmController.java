@@ -1,14 +1,18 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Для FilmController:
@@ -17,11 +21,11 @@ import java.util.HashMap;
  * получение всех фильмов.
  */
 @RestController
+@Slf4j
 public class FilmController {
-    private int id;
-    private final HashMap<Integer, Film> filmHashMap = new HashMap<>();
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
-    private final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+
+    private long id;
+    private final Map<Long, Film> films = new HashMap<>();
 
     /**
      * возвращает список фильмов
@@ -29,14 +33,14 @@ public class FilmController {
      * @return ArrayList
      */
     @GetMapping("/films")
-    public ArrayList<Film> getFilms() {
-        return new ArrayList<>(filmHashMap.values());
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values());
     }
 
     /**
      * создает объект фильм и помещает в мап
      *
-     * @param film        - flim
+     * @param film        - film
      * @param releaseDate - date
      * @return film
      */
@@ -46,7 +50,21 @@ public class FilmController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate releaseDate) {
 
         log.info("POST request /film with data=" + film);
-        if (filmHashMap.containsKey(film.getId())) {
+
+        filmsValidation(film);
+
+        film.setId(++id);
+        films.put(film.getId(), film);
+        return film;
+    }
+
+    /**
+     * выполняет валидацию фильма в зависимости от условий
+     *
+     * @param film
+     */
+    private void filmsValidation(Film film) {
+        if (films.containsKey(film.getId())) {
             log.warn("POST request FILM, film exists" + film);
             throw new ValidationException("film exists" + film);
         } else if (film.getName() == null || film.getName().isEmpty()) {
@@ -55,16 +73,14 @@ public class FilmController {
         } else if (film.getDescription().length() > 200) {
             log.warn("POST request FILM, description length exceeded 200. Must be less " + film);
             throw new ValidationException("Films description length exceeded 200. Must be less ");
-        } else if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
+        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.warn("POST request FILM, release date is not valid " + film);
             throw new ValidationException("Films release date is not valid ");
         } else if (film.getDuration() <= 0) {
             log.warn("POST request FILM, duration must be positive " + film);
             throw new ValidationException("Films duration must be positive ");
         }
-        film.setId(++id);
-        filmHashMap.put(film.getId(), film);
-        return film;
+
     }
 
     /**
@@ -78,12 +94,12 @@ public class FilmController {
     public Film updateFilm(
             @RequestBody Film film,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate localDate) {
-        if (!filmHashMap.containsKey(film.getId())) {
+        if (!films.containsKey(film.getId())) {
             log.warn("PUT request FILM, no such film" + film);
             throw new ValidationException("PUT request FILM, no such film");
         } else {
             log.warn("PUT request FILM, updating" + film);
-            filmHashMap.put(film.getId(), film);
+            films.put(film.getId(), film);
         }
         return film;
     }

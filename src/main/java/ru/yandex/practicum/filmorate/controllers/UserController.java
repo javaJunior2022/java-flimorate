@@ -1,14 +1,17 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -17,27 +20,28 @@ import java.util.HashMap;
  * получение списка всех пользователей.
  */
 @RestController
+@Slf4j
 public class UserController {
 
-    private final HashMap<Integer, User> userHashMap  = new HashMap<>();
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
-    private static int id = 0;
-
+    private static long id = 0;
+    private final HashMap<Long, User> users = new HashMap<>();
 
     /**
      * Возвращает список пользователей
+     *
      * @return ArrayList<User>
      */
     @GetMapping("/users")
-    public ArrayList<User> getUsers() {
+    public List<User> getUsers() {
         log.info("Get request get/Users");
-        return new ArrayList<>(userHashMap.values());
+        return new ArrayList<>(users.values());
     }
 
     /**
-     *  Валидация и создание пользователя
-     * @param user - user
-     * @param localDate  - birthday
+     * Валидация и создание пользователя
+     *
+     * @param user      - user
+     * @param localDate - birthday
      * @return user
      */
 
@@ -47,10 +51,23 @@ public class UserController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate localDate) {
 
         log.info("POST request /user with data=" + user);
-        if (userHashMap.containsKey(user.getId())){
+        usersValidation(user);
+
+        user.setId(++id);
+        users.put(user.getId(), user);
+        return user;
+    }
+
+    /**
+     * Валидация пользователя
+     *
+     * @param user
+     */
+    private void usersValidation(User user) {
+        if (users.containsKey(user.getId())) {
             log.warn("POST request USER, user exists" + user);
             throw new ValidationException("user exists" + user);
-        }else if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
+        } else if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.warn("POST request USER, email is empty, null or has no @ symbol" + user);
             throw new ValidationException("email is empty, null or has no @ symbol" + user);
         } else if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
@@ -65,15 +82,13 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
-        user.setId(++id);
-        userHashMap.put(user.getId(),user);
-        return user;
     }
 
     /**
      * Обновление данных пользователя при нахождении ID
      * в противном случае - генерация исключения
-     * @param user - user
+     *
+     * @param user      - user
      * @param localDate -date
      * @return user
      */
@@ -83,12 +98,12 @@ public class UserController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate localDate) {
 
         log.info("PUT request with data=" + user);
-        if (!userHashMap.containsKey(user.getId())) {
+        if (!users.containsKey(user.getId())) {
             log.warn("PUT request USER, no such user" + user);
-           throw  new ValidationException("PUT request USER, no such user");
+            throw new ValidationException("PUT request USER, no such user");
         } else {
             log.warn("PUT request USER, updating" + user);
-           userHashMap.put(user.getId(),user);
+            users.put(user.getId(), user);
         }
         return user;
     }

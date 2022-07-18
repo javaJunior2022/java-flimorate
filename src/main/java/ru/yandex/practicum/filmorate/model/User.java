@@ -21,7 +21,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private int id;
+    private long id;
     private String email;
     private String login;
     private String name;
@@ -34,7 +34,7 @@ public class User {
         User user = (User) o;
         return login.equals(user.login);
     }
-//jjjj
+
     @Override
     public int hashCode() {
         return Objects.hash(login);
