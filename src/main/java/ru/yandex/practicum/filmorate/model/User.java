@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * целочисленный идентификатор — id;
@@ -14,6 +16,7 @@ import java.util.Objects;
  * логин пользователя — login;
  * имя для отображения — name;
  * дата рождения — birthday.
+ * Друзья - friends
  */
 
 @Getter
@@ -26,6 +29,8 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+
+    private final Set<Long> friends=new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
