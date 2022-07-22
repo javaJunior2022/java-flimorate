@@ -57,20 +57,20 @@ public class FilmController {
     }
 
     /**
-     * создает объект фильм и помещает в мап
+     * создает объект фильм
      *
-     * @param film        - film
+     * @param film - film
      * @return film
      */
     @PostMapping("/films")
-    public Film create(@Valid @RequestBody Film film){
+    public Film create(@Valid @RequestBody Film film) {
         return filmService.create(film);
     }
 
     /**
      * Обновляет данные о фильме
      *
-     * @param film      film
+     * @param film film
      * @return - film
      */
     @PutMapping("/films")

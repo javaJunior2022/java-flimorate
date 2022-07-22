@@ -9,8 +9,11 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserService {
@@ -134,15 +137,10 @@ public class UserService {
     public List<User> getCommonFriends(Long user1Id, Long user2Id) {
         Set<Long> users1 = userStorage.getUserById(user1Id).getFriends();
         Set<Long> users2 = userStorage.getUserById(user2Id).getFriends();
-        List<User> commonFriends = new ArrayList<>();
 
-        for (Long id1 : users1) {
-            for (Long id2 : users2) {
-                if (id1.equals(id2)) {
-                    commonFriends.add(userStorage.getUserById(id1));
-                }
-            }
-        }
+        List<User> commonFriends = (List<User>) users1.stream().filter(users2::contains).collect(Collectors.toList()).
+                stream().map(x -> getUserById(x)).collect(Collectors.toList());
+
         return commonFriends;
     }
 

@@ -105,7 +105,7 @@ public class InMemoryFilmStorage implements FilmStorage {
      */
     @Override
     public Film getFilmById(Long filmId) {
-        if (!films.containsKey(filmId)){
+        if (!films.containsKey(filmId)) {
             throw new EntityNotFoundException("Film not found");
         }
         return films.get(filmId);
