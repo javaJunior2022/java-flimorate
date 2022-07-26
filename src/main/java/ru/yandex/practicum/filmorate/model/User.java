@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,8 +31,8 @@ public class User {
     private String name;
     private LocalDate birthday;
 
-    private final Set<Long> friends = new HashSet<>();
-
+    private final Set<Long> friends = new HashSet<>(); // список друзей
+    private Map<User,Boolean> friendStatues; // статусы по друзьям
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

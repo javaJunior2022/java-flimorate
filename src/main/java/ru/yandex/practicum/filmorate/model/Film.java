@@ -24,8 +24,10 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+    private String mpa;
 
     private final Set<Long> likes = new HashSet<>();
+    private final Set<String> genres = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
