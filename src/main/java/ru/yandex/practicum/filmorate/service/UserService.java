@@ -9,16 +9,16 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Service
 public class UserService {
 
     private UserStorage userStorage;
+
 
     @Autowired
     public UserService(UserStorage userStorage) {
@@ -93,8 +93,8 @@ public class UserService {
                 !userStorage.getUsers().contains(getUserById(friendId))) {
             throw new EntityNotFoundException("user not found");
         }
-        getUserById(userId).getFriends().add(friendId);
-        getUserById(friendId).getFriends().add(userId);
+        getUserById(userId).getFriends().add(getUserById(friendId));
+        getUserById(friendId).getFriends().add(getUserById(userId));
     }
 
     /**
@@ -121,8 +121,8 @@ public class UserService {
     public List<User> getListFriends(Long userId) {
         List<User> userFriendsList = new ArrayList<>();
 
-        for (Long id1 : userStorage.getUserById(userId).getFriends()) {
-            userFriendsList.add(userStorage.getUserById(id1));
+        for (User user1 : userStorage.getUserById(userId).getFriends()) {
+            userFriendsList.add(userStorage.getUserById(user1.getId()));
         }
         return userFriendsList;
     }
@@ -135,11 +135,11 @@ public class UserService {
      * @return
      */
     public List<User> getCommonFriends(Long user1Id, Long user2Id) {
-        Set<Long> users1 = userStorage.getUserById(user1Id).getFriends();
-        Set<Long> users2 = userStorage.getUserById(user2Id).getFriends();
+        List<User> users1 = userStorage.getUserById(user1Id).getFriends();
+        List<User> users2 = userStorage.getUserById(user2Id).getFriends();
 
         List<User> commonFriends = (List<User>) users1.stream().filter(users2::contains).collect(Collectors.toList()).
-                stream().map(x -> getUserById(x)).collect(Collectors.toList());
+                stream().map(x -> getUserById(x.getId())).collect(Collectors.toList());
 
         return commonFriends;
     }

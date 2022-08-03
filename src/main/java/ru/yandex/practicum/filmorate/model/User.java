@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * целочисленный идентификатор — id;
@@ -26,13 +23,13 @@ import java.util.Set;
 @AllArgsConstructor
 public class User {
     private long id;
-    private String email;
-    private String login;
     private String name;
+    private String login;
+    private String email;
     private LocalDate birthday;
+    private  List<User> friends = new ArrayList<>();
 
-    private final Set<Long> friends = new HashSet<>(); // список друзей
-    private Map<User,Boolean> friendStatues; // статусы по друзьям
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
